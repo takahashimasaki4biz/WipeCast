@@ -1,6 +1,6 @@
 # include "createRGB24.h"
 
-BYTE* createRGB24fromYUY2(BYTE* pDataYUY2, UINT32 width, UINT32 height) {
+BYTE* createRGB24fromYUY2(BYTE* pDataYUY2, UINT32 width, UINT32 height, bool mirror) {
     BYTE* pDataRGB24 = new BYTE[width * height * 3];
     for (UINT32 y = 0; y < height; ++y) {
         for (UINT32 x = 0; x < width; x += 2) {
@@ -28,14 +28,15 @@ BYTE* createRGB24fromYUY2(BYTE* pDataYUY2, UINT32 width, UINT32 height) {
             B1 = B1 < 0 ? 0 : B1 > 255 ? 255 : B1;
 
             // RGB storage for the first pixel
-            pDataRGB24[(y * width + x) * 3 + 2] = static_cast<BYTE>(R0);
-            pDataRGB24[(y * width + x) * 3 + 1] = static_cast<BYTE>(G0);
-            pDataRGB24[(y * width + x) * 3 + 0] = static_cast<BYTE>(B0);
+            int x2 = mirror ? ((width - 1) - x) : x;
+            pDataRGB24[(y * width + x2) * 3 + 2] = static_cast<BYTE>(R0);
+            pDataRGB24[(y * width + x2) * 3 + 1] = static_cast<BYTE>(G0);
+            pDataRGB24[(y * width + x2) * 3 + 0] = static_cast<BYTE>(B0);
             // RGB storage for the second pixel
             if (x + 1 < width) {
-                pDataRGB24[(y * width + x + 1) * 3 + 2] = static_cast<BYTE>(R1);
-                pDataRGB24[(y * width + x + 1) * 3 + 1] = static_cast<BYTE>(G1);
-                pDataRGB24[(y * width + x + 1) * 3 + 0] = static_cast<BYTE>(B1);
+                pDataRGB24[(y * width + x2 + 1) * 3 + 2] = static_cast<BYTE>(R1);
+                pDataRGB24[(y * width + x2 + 1) * 3 + 1] = static_cast<BYTE>(G1);
+                pDataRGB24[(y * width + x2 + 1) * 3 + 0] = static_cast<BYTE>(B1);
             }
         }
     }

@@ -14,6 +14,7 @@
 PCWSTR AppName = L"WipeCast";
 HWND hWnd = nullptr;
 UINT32 circleSize = 400;
+bool mirror = false;
 RECT lastrect;
 CameraDevice* pCameraDevice = nullptr;
 UINT32 cameraIndex = 0;
@@ -108,15 +109,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     case WM_CHAR:
     {
-        // 「q」キーで終了させる（タスクバーからウィンドウを閉じても良い）
         TCHAR chCharCode = (TCHAR)wParam;
         switch (chCharCode)
         {
-        case 'q':
-            PostMessage(hWnd, WM_CLOSE, 0, 0);
+        case 'm':
+        case 'r':
+            // 「m」「r」キーで左右反転させる
+            mirror = mirror ? false : true;
             break;
+        case 'q':
+            // 「q」キーで終了させる（タスクバーからウィンドウを閉じても良い）
+            PostMessage(hWnd, WM_CLOSE, 0, 0);
+            return 0;
         }
-        return 0;
+        break;
     }
     case WM_DESTROY:
     {
@@ -220,11 +226,11 @@ void RenderFrame(HWND hWnd, int circleSize, CameraDevice* pCameraDevice)
         GUID videoSubtype = pCameraDevice->subtype();
         if (videoSubtype == MFVideoFormat_YUY2)
         {
-            pDataRGB24.reset(createRGB24fromYUY2(pData, width, height));
+            pDataRGB24.reset(createRGB24fromYUY2(pData, width, height, mirror));
         }
         else if (videoSubtype == MFVideoFormat_NV12)
         {
-            pDataRGB24.reset(createRGB24fromNV12(pData, width, height));
+            pDataRGB24.reset(createRGB24fromNV12(pData, width, height, mirror));
         }
 
         // ビデオフレームデータをウィンドウに描画する

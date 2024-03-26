@@ -1,6 +1,6 @@
 # include "createRGB24.h"
 
-BYTE* createRGB24fromNV12(BYTE* pDataNV12, UINT32 width, UINT32 height) {
+BYTE* createRGB24fromNV12(BYTE* pDataNV12, UINT32 width, UINT32 height, bool mirror) {
     BYTE* pDataRGB24 = new BYTE[width * height * 3];
     const int uv_offset = width * height;
     for (UINT32 y = 0; y < height; ++y) {
@@ -20,7 +20,8 @@ BYTE* createRGB24fromNV12(BYTE* pDataNV12, UINT32 width, UINT32 height) {
             G = G < 0 ? 0 : G > 255 ? 255 : G;
             B = B < 0 ? 0 : B > 255 ? 255 : B;
             // RGB storage
-            int rgb_index = 3 * y_index;
+            int x2 = mirror ? ((width - 1) - x) : x;
+            int rgb_index = (y * width + x2) * 3;
             pDataRGB24[rgb_index + 2] = R;
             pDataRGB24[rgb_index + 1] = G;
             pDataRGB24[rgb_index + 0] = B;
